@@ -36,6 +36,10 @@ grist.onRecord(function (record, mappings) {
     if (!window.editor) { return; }
     // If this is a new record, or mapping is diffrent.
     if (recordId !== record.id || mappings?.Content !== columnName) {
+        // 別の行に移動した場合は前回最後のコンテンツを保存する
+        saveToGrist(editor.getData())
+
+        // 新しい行での初期作業
         recordId = record.id;
         columnName = mappings?.Content;
         const mapped = grist.mapColumnNames(record);
@@ -45,9 +49,6 @@ grist.onRecord(function (record, mappings) {
         } else {
             window.editor.setData(mapped.Content)
         }
-        //	else if (lastContent !== mapped.Content) {
-
-        //	}
     }
 });
 
