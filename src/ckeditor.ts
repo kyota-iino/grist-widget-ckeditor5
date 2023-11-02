@@ -86,7 +86,7 @@ class Editor extends ClassicEditor {
 		Strikethrough,
 		Table,
 		TableToolbar,
-		Title,
+		//Title,
 		TodoList
 	];
 
