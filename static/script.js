@@ -58,7 +58,6 @@ grist.onRecord(function (record, mappings) {
             console.error('Please map columns');
         } else {
             window.editor.setData(mapped.Content)
-            console.log("MyLog: readonly=" + window.editor.isReadOnly)
             if (window.editor.isReadOnly) {
                 window.editor.disableReadOnlyMode(gristReadOnlyModeId)  // 読み込み専用解除
             }
