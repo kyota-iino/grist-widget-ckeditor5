@@ -1,4 +1,8 @@
+//
 // Grist
+//
+
+// 初期化
 grist.ready({
     requiredAccess: 'full', columns: [{ name: 'Content', type: 'Text' }],
 });
@@ -6,6 +10,7 @@ grist.ready({
 let lastSave = null; // 保存中かを判別するため
 let recordId = null;
 let columnName = null;
+const gristReadOnlyModeId = "my-lock-id";  // 読み込み専用モード時の
 
 function saveToGrist(content) {
     if (lastSave) { // 保存作業が未完了の場合は何もしない
@@ -13,7 +18,7 @@ function saveToGrist(content) {
     }
 
     const table = grist.getTable?.();
-    if (table && recordId && columnName) {
+    if (table && recordId && columnName) {  // 未作成のレコードにフォーカスした後などは保存出来ないように
         lastSave = table.update({
             id: recordId,
             fields: {
@@ -23,15 +28,20 @@ function saveToGrist(content) {
     }
 }
 
+// 未作成のレコードにフォーカスした場合
 grist.onNewRecord(function () {
+    // 前回最後のコンテンツを保存する
+    saveToGrist(editor.getData())
+
     recordId = null;
     columnName = null;
     if (window.editor) {
         window.editor.setData("")
+        window.editor.enableReadOnlyMode(gristReadOnlyModeId)  // 読み込み専用に
     }
 })
 
-// Grist 初期化
+// 別の作成済みのレコードに移動した場合
 grist.onRecord(function (record, mappings) {
     if (!window.editor) { return; }
     // If this is a new record, or mapping is diffrent.
@@ -48,6 +58,10 @@ grist.onRecord(function (record, mappings) {
             console.error('Please map columns');
         } else {
             window.editor.setData(mapped.Content)
+            console.log("MyLog: readonly=" + window.editor.isReadOnly)
+            if (window.editor.isReadOnly) {
+                window.editor.disableReadOnlyMode(gristReadOnlyModeId)  // 読み込み専用解除
+            }
         }
     }
 });
